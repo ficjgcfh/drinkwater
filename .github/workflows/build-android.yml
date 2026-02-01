@@ -1,0 +1,70 @@
+name: 构建 Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 检出代码
+      uses: actions/checkout@v3
+
+    - name: 🟢 设置 Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: ☕ 设置 Java JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '11'
+        cache: 'gradle'
+
+    - name: 📦 安装 Cordova
+      run: |
+        npm install -g cordova@latest
+        cordova --version
+
+    - name: 📚 安装项目依赖
+      run: |
+        if [ -f package.json ]; then
+          npm install
+        fi
+
+    - name: 🤖 添加 Android 平台
+      run: |
+        cordova platform add android
+        cordova platform ls
+
+    - name: ✅ 检查构建要求
+      run: cordova requirements android || true
+
+    - name: 🔨 构建 Debug APK
+      run: |
+        cordova build android --debug --verbose
+
+    - name: 📝 显示 APK 信息
+      run: |
+        ls -lh platforms/android/app/build/outputs/apk/debug/
+        file platforms/android/app/build/outputs/apk/debug/app-debug.apk
+
+    - name: 📤 上传 APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: drinkwater-debug-apk
+        path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
+        if-no-files-found: error
+
+    - name: 🎉 构建成功
+      run: |
+        echo "✅ APK 构建成功！"
+        echo "📱 下载位置：GitHub Actions Artifacts"
+        echo "📦 文件名：drinkwater-debug-apk"

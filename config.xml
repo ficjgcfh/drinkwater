@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.ruthirsty.drinkwater" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>喝水打卡</name>
+    <description>
+        一个简单实用的喝水提醒打卡应用，帮助您养成良好的喝水习惯。
+    </description>
+    <author email="ruthirsty@example.com" href="https://github.com/RUthirsty">
+        RUthirsty Team
+    </author>
+    <content src="index.html" />
+
+    <!-- 配置 -->
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="android-minSdkVersion" value="24" />
+    <preference name="android-targetSdkVersion" value="35" />
+    <preference name="Orientation" value="portrait" />
+
+    <!-- 权限 -->
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+
+    <!-- Android 平台配置 -->
+    <platform name="android">
+        <preference name="AndroidPersistentFileLocation" value="Internal" />
+        <icon density="ldpi" src="www/img/icon-ldpi.png" />
+        <icon density="mdpi" src="www/img/icon-mdpi.png" />
+        <icon density="hdpi" src="www/img/icon-hdpi.png" />
+        <icon density="xhdpi" src="www/img/icon-xhdpi.png" />
+        <icon density="xxhdpi" src="www/img/icon-xxhdpi.png" />
+        <icon density="xxxhdpi" src="www/img/icon-xxxhdpi.png" />
+    </platform>
+
+    <!-- 访问控制 -->
+    <access origin="*" />
+    <allow-navigation href="*" />
+</widget>

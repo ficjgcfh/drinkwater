@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; img-src 'self' data: content:;">
+        <meta name="format-detection" content="telephone=no">
+        <meta name="msapplication-tap-highlight" content="no">
+        <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+        <meta name="color-scheme" content="light dark">
+        <link rel="stylesheet" href="css/index.css">
+        <title>喝水打卡</title>
+    </head>
+    <body>
+        <div class="app">
+            <div class="header">
+                <h1>💧 喝水打卡</h1>
+                <div class="date" id="currentDate"></div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="todayCount">0</div>
+                    <div class="stat-label">今日打卡</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalCount">0</div>
+                    <div class="stat-label">总计打卡</div>
+                </div>
+                <div class="stat-card full-width">
+                    <svg class="progress-ring">
+                        <circle class="progress-ring-circle"
+                                stroke-dasharray="314 314"
+                                stroke-dashoffset="314"
+                                cx="60" cy="60" r="50"
+                                id="progressCircle">
+                        </circle>
+                    </svg>
+                    <div class="progress-text" id="progressText">0/8</div>
+                    <div class="stat-label">今日目标</div>
+                </div>
+            </div>
+
+            <div class="check-in-section">
+                <button class="check-in-btn" id="checkInBtn">
+                    <span class="btn-icon">💧</span>
+                    <span class="btn-text">打卡喝水</span>
+                </button>
+            </div>
+
+            <div class="records-section">
+                <div class="section-header">
+                    <h2>今日记录</h2>
+                    <button class="clear-btn" id="clearBtn">清空记录</button>
+                </div>
+                <div class="records-list" id="recordsList">
+                    <p class="no-records">还没有打卡记录，快来喝水吧！</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast" id="toast"></div>
+        <script src="cordova.js"></script>
+        <script src="js/index.js"></script>
+    </body>
+</html>

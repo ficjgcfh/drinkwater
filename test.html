@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, width=device-width, viewport-fit=cover">
+    <title>喝水打卡 - 浏览器测试版</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', 'Roboto', sans-serif;
+            font-size: 16px;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .app {
+            height: 100%;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0 0 10px 0;
+        }
+
+        .date {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .stats {
+            margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #11998e;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .check-in-section {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .check-in-btn {
+            background: linear-gradient(135deg, #56ccf2 0%, #2f80ed 100%);
+            border: none;
+            border-radius: 50px;
+            padding: 20px 50px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(47, 128, 237, 0.4);
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .check-in-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(47, 128, 237, 0.5);
+        }
+
+        .check-in-btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-icon {
+            font-size: 24px;
+        }
+
+        .records-section {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .section-header h2 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin: 0;
+        }
+
+        .clear-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clear-btn:hover {
+            background: #ff3838;
+        }
+
+        .records-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .no-records {
+            text-align: center;
+            color: #999;
+            padding: 30px 0;
+            margin: 0;
+        }
+
+        .record-item {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .record-icon {
+            font-size: 24px;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .record-info {
+            flex: 1;
+        }
+
+        .record-time {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .record-date {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .record-number {
+            font-size: 14px;
+            color: #11998e;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .check-in-btn.animate {
+            animation: pulse 0.3s ease;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .progress-ring {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 10px;
+        }
+
+        .progress-ring-circle {
+            stroke: #11998e;
+            stroke-width: 8;
+            fill: transparent;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 0.5s ease;
+        }
+
+        .progress-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #11998e;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <div class="header">
+            <h1>💧 喝水打卡</h1>
+            <div class="date" id="currentDate"></div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="todayCount">0</div>
+                <div class="stat-label">今日打卡</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalCount">0</div>
+                <div class="stat-label">总计打卡</div>
+            </div>
+            <div class="stat-card full-width">
+                <svg class="progress-ring">
+                    <circle class="progress-ring-circle"
+                            stroke-dasharray="314 314"
+                            stroke-dashoffset="314"
+                            cx="60" cy="60" r="50"
+                            id="progressCircle">
+                    </circle>
+                </svg>
+                <div class="progress-text" id="progressText">0/8</div>
+                <div class="stat-label">今日目标</div>
+            </div>
+        </div>
+
+        <div class="check-in-section">
+            <button class="check-in-btn" id="checkInBtn">
+                <span class="btn-icon">💧</span>
+                <span class="btn-text">打卡喝水</span>
+            </button>
+        </div>
+
+        <div class="records-section">
+            <div class="section-header">
+                <h2>今日记录</h2>
+                <button class="clear-btn" id="clearBtn">清空记录</button>
+            </div>
+            <div class="records-list" id="recordsList">
+                <p class="no-records">还没有打卡记录，快来喝水吧！</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const STORAGE_KEY = 'drinkWaterRecords';
+        const DAILY_GOAL = 8;
+
+        function init() {
+            updateDate();
+            updateStats();
+            loadRecords();
+
+            document.getElementById('checkInBtn').addEventListener('click', handleCheckIn);
+            document.getElementById('clearBtn').addEventListener('click', handleClear);
+        }
+
+        function updateDate() {
+            const dateElement = document.getElementById('currentDate');
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekday = weekdays[now.getDay()];
+
+            dateElement.textContent = `${year}年${month}月${day}日 星期${weekday}`;
+        }
+
+        function getTodayString() {
+            const now = new Date();
+            return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+        }
+
+        function getAllRecords() {
+            const data = localStorage.getItem(STORAGE_KEY);
+            return data ? JSON.parse(data) : [];
+        }
+
+        function saveRecord(record) {
+            const records = getAllRecords();
+            records.unshift(record);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+        }
+
+        function getTodayRecords() {
+            const today = getTodayString();
+            const allRecords = getAllRecords();
+            return allRecords.filter(record => record.date === today);
+        }
+
+        function updateStats() {
+            const todayRecords = getTodayRecords();
+            const allRecords = getAllRecords();
+
+            document.getElementById('todayCount').textContent = todayRecords.length;
+            document.getElementById('totalCount').textContent = allRecords.length;
+
+            // 更新进度环
+            const progress = Math.min(todayRecords.length, DAILY_GOAL);
+            const percentage = progress / DAILY_GOAL;
+            const circumference = 2 * Math.PI * 50;
+            const offset = circumference * (1 - percentage);
+
+            document.getElementById('progressCircle').style.strokeDashoffset = offset;
+            document.getElementById('progressText').textContent = `${progress}/${DAILY_GOAL}`;
+        }
+
+        function loadRecords() {
+            const todayRecords = getTodayRecords();
+            const recordsList = document.getElementById('recordsList');
+
+            if (todayRecords.length === 0) {
+                recordsList.innerHTML = '<p class="no-records">还没有打卡记录，快来喝水吧！</p>';
+                return;
+            }
+
+            let html = '';
+            todayRecords.forEach((record, index) => {
+                html += `
+                    <div class="record-item">
+                        <div class="record-icon">💧</div>
+                        <div class="record-info">
+                            <div class="record-time">${record.time}</div>
+                            <div class="record-date">${record.date}</div>
+                        </div>
+                        <div class="record-number">第${todayRecords.length - index}次</div>
+                    </div>
+                `;
+            });
+
+            recordsList.innerHTML = html;
+        }
+
+        function handleCheckIn() {
+            const now = new Date();
+            const timeString = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+
+            const record = {
+                date: getTodayString(),
+                time: timeString,
+                timestamp: now.getTime()
+            };
+
+            saveRecord(record);
+
+            const btn = document.getElementById('checkInBtn');
+            btn.classList.add('animate');
+            setTimeout(() => btn.classList.remove('animate'), 300);
+
+            updateStats();
+            loadRecords();
+
+            const todayCount = getTodayRecords().length;
+            if (todayCount >= DAILY_GOAL) {
+                showToast('🎉 恭喜！已完成今日目标！');
+            } else {
+                showToast('✅ 打卡成功！继续加油！');
+            }
+        }
+
+        function handleClear() {
+            if (confirm('确定要清空所有记录吗？此操作不可恢复！')) {
+                localStorage.removeItem(STORAGE_KEY);
+                updateStats();
+                loadRecords();
+                showToast('🗑️ 记录已清空');
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+
+        // 页面加载完成后初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

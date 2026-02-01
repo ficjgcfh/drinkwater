@@ -27,36 +27,43 @@ jobs:
         java-version: '17'
 
     - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
+      uses: android-actions/setup-android@v3
+
+    - name: Accept Android SDK licenses
+      run: yes | sdkmanager --licenses || true
+
+    - name: Install Android SDK components
+      run: |
+        sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
     - name: Install Cordova
-      run: |
-        npm install -g cordova@latest
+      run: npm install -g cordova@latest
 
-    - name: Install dependencies
-      run: |
-        cd drinkwater
-        npm install
+    - name: Install project dependencies
+      run: npm install
 
     - name: Add Android platform
-      run: |
-        cd drinkwater
-        cordova platform add android
+      run: cordova platform add android
 
     - name: Build debug APK
-      run: |
-        cd drinkwater
-        cordova build android --debug
+      run: cordova build android --debug
 
     - name: Upload APK artifact
       uses: actions/upload-artifact@v3
       with:
         name: app-debug
-        path: drinkwater/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+        path: platforms/android/app/build/outputs/apk/debug/app-debug.apk
 
     - name: Get APK info
       run: |
-        cd drinkwater
-        APK_SIZE=$(ls -lh platforms/android/app/build/outputs/apk/debug/app-debug.apk | awk '{print $5}')
-        echo "✅ APK 构建成功!"
-        echo "📦 APK 大小: $APK_SIZE"
+        APK_PATH="platforms/android/app/build/outputs/apk/debug/app-debug.apk"
+        if [ -f "$APK_PATH" ]; then
+          APK_SIZE=$(ls -lh "$APK_PATH" | awk '{print $5}')
+          echo "✅ APK 构建成功!"
+          echo "📦 APK 大小: $APK_SIZE"
+          echo "📍 APK 路径: $APK_PATH"
+        else
+          echo "❌ APK 文件未找到"
+          exit 1
+        fi
+

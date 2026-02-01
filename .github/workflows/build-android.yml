@@ -19,14 +19,12 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: '18'
-        cache: 'npm'
 
     - name: ☕ 设置 Java JDK
       uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
         java-version: '11'
-        cache: 'gradle'
 
     - name: 📦 安装 Cordova
       run: |

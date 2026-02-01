@@ -1,0 +1,62 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:  # 允许手动触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Setup Java
+      uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v2
+
+    - name: Install Cordova
+      run: |
+        npm install -g cordova@latest
+
+    - name: Install dependencies
+      run: |
+        cd drinkwater
+        npm install
+
+    - name: Add Android platform
+      run: |
+        cd drinkwater
+        cordova platform add android
+
+    - name: Build debug APK
+      run: |
+        cd drinkwater
+        cordova build android --debug
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-debug
+        path: drinkwater/platforms/android/app/build/outputs/apk/debug/app-debug.apk
+
+    - name: Get APK info
+      run: |
+        cd drinkwater
+        APK_SIZE=$(ls -lh platforms/android/app/build/outputs/apk/debug/app-debug.apk | awk '{print $5}')
+        echo "✅ APK 构建成功!"
+        echo "📦 APK 大小: $APK_SIZE"
